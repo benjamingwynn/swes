@@ -55,38 +55,38 @@ async function helpAll() {
 	console.log(
 		"    " +
 			`  ${c.bold(c.yellow("entrypoint"))}: ${
-				defaults.includes("entrypoint") ? c.bgBlack(`"${config.entrypoint}"`) : c.bgYellow(`"${config.entrypoint}"`)
+				defaults.includes("entrypoint") ? c.bgMagenta(`"${config.entrypoint}"`) : c.bgYellow(`"${config.entrypoint}"`)
 			},`
 	)
 	console.log(
 		"    " +
 			`  ${c.bold(c.cyan("serviceWorkers"))}: ${
-				defaults.includes("serviceWorkers") ? c.bgBlack(`"${config.serviceWorkers}"`) : c.bgYellow(`"${config.serviceWorkers}"`)
+				defaults.includes("serviceWorkers") ? c.bgMagenta(`"${config.serviceWorkers}"`) : c.bgYellow(`"${config.serviceWorkers}"`)
 			},`
 	)
 	console.log(
 		"    " +
 			`  ${c.bold(c.redBright("devPort"))}: ${
-				defaults.includes("devPort") ? c.bgBlack(config.devPort.toString()) : c.bgYellow(config.devPort.toString())
+				defaults.includes("devPort") ? c.bgMagenta(config.devPort.toString()) : c.bgYellow(config.devPort.toString())
 			},`
 	)
 	console.log(
 		"    " +
 			`  ${c.bold(c.green("buildFolder"))}: ${
-				defaults.includes("buildFolder") ? c.bgBlack(`"${config.buildFolder}"`) : c.bgYellow(`"${config.buildFolder}"`)
+				defaults.includes("buildFolder") ? c.bgMagenta(`"${config.buildFolder}"`) : c.bgYellow(`"${config.buildFolder}"`)
 			},`
 	)
 	console.log(
 		"    " +
-			`  ${c.bold(c.magenta("metaFile"))}: ${defaults.includes("metaFile") ? c.bgBlack(`"${config.metaFile}"`) : c.bgYellow(`"${config.metaFile}"`)},`
+			`  ${c.bold(c.magenta("metaFile"))}: ${defaults.includes("metaFile") ? c.bgMagenta(`"${config.metaFile}"`) : c.bgYellow(`"${config.metaFile}"`)},`
 	)
 	console.log(
 		"    " +
 			`  ${c.bold(c.blue("visualizer"))}: ${
-				defaults.includes("visualizer") ? c.bgBlack(`"${config.visualizer}"`) : c.bgYellow(`"${config.visualizer}"`)
+				defaults.includes("visualizer") ? c.bgMagenta(`"${config.visualizer}"`) : c.bgYellow(`"${config.visualizer}"`)
 			},`
 	)
-	console.log("    " + "}]\n")
+	console.log("    " + "}\n")
 
 	if (configPath) {
 		console.log("  " + "Using configuration from " + c.bgYellow(`'${configPath}'`) + ", configure this file to change parameters.")
@@ -94,7 +94,7 @@ async function helpAll() {
 		console.log("  " + "Create a file at '" + path.join(process.cwd(), "swes.jsonc") + "' to configure the above parameters.")
 	}
 	if (defaults.length) {
-		console.log("\n  " + "Using defaults for: " + defaults.map((x) => c.bgBlack(x)).join(", "))
+		console.log("\n  " + "Using defaults for: " + defaults.map((x) => c.bgMagenta(x)).join(", "))
 		if (configPath) {
 			console.log("  " + "Define these by adding them to the file above")
 		}
