@@ -10,10 +10,10 @@ export const makeBuildOptions = (dev: boolean, extra?: {define: BuildOptions["de
 		entryPoints: ["./src/index.html"],
 		minify: !dev,
 		sourcemap: dev,
-		banner: {
-			js: `/* https://github.com/benjamingwynn/tetromino */`,
-			css: `/* https://github.com/benjamingwynn/tetromino */`,
-		},
+		// banner: {
+		// 	js: `/* https://github.com/benjamingwynn/swes */`,
+		// 	css: `/* https://github.com/benjamingwynn/swes */`,
+		// },
 		outdir: dev ? ".swes" : "dist",
 		assetNames: "assets/[name]-[hash]",
 		platform: "browser",
