@@ -7,6 +7,9 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
+	"bin": {
+		"swes": "cli.ts"
+	},
 	"keywords": [],
 	"author": "",
 	"license": "GPL-2.0-only",
@@ -14,17 +17,18 @@
 		"esbuild-visualizer": "^0.6.0"
 	},
 	"peerDependencies": {
-		"@chialab/esbuild-plugin-html": "benjamingwynn/esbuild-plugin-html",
+		"@chialab/esbuild-plugin-html": ">=0.19.0-beta.1",
 		"svelte": "4",
-		"svelte-preprocess": "*`",
+		"svelte-preprocess": "*",
 		"esbuild": ">=0.20",
 		"esbuild-svelte": ">=0.8",
-		"typescript": ">5",
-		"htmlnano": ">2",
-		"less": ">4"
+		"typescript": "5",
+		"htmlnano": "2",
+		"bests": ">=0.0.3",
+		"less": "4"
 	},
 	"devDependencies": {
-		"@chialab/esbuild-plugin-html": "benjamingwynn/esbuild-plugin-html",
+		"@chialab/esbuild-plugin-html": ">=0.19.0-beta.1",
 		"svelte": "^4.2.15",
 		"less": "4.2.0",
 		"svelte-preprocess": "^5.1.4",
