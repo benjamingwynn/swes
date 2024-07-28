@@ -9,6 +9,7 @@ import fsp from "fs/promises"
 import c from "ansi-colors"
 import {getConfig} from "./config.ts"
 import {build} from "./esBuild.ts"
+import {startDevServer} from "./esDev.ts"
 
 const packageJSON = JSON.parse((await fsp.readFile(path.join(fileURLToPath(import.meta.url), "..", "package.json"))).toString())
 
@@ -116,6 +117,9 @@ await (async function swesCli() {
 
 	const command = args.at(0)
 	switch (command) {
+		case "dev": {
+			return await startDevServer()
+		}
 		case "build": {
 			return await build()
 		}
