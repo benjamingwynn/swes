@@ -1,4 +1,4 @@
-#!/usr/bin/env node --import bests
+#!/usr/bin/env -S node --import bests
 /**
  * @author Benjamin Gwynn <contact@benjamingwynn.com>
  * @format
