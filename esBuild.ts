@@ -2,6 +2,7 @@
 
 import path from "node:path"
 import esbuild from "esbuild"
+import * as fs from "node:fs"
 import * as fsp from "node:fs/promises"
 import {makeBuildOptions} from "./esOpts.ts"
 import {stage} from "./buildStage.ts"
@@ -11,14 +12,16 @@ export async function build() {
 	await stage("Cleanup environment", () => cleanup())
 	// 1. build the main program from the html
 	const builtAssets = await stage("Build main program", () => buildMainProgram())
-	// 2. build the service workers that can refer to assets built from the main program
-	const serviceWorkers = await stage("Build service workers", () => buildServiceWorkers(builtAssets))
-	// 3. build the service worker registering program that can refer to the service workers built
-	const toInject = await stage("Build service worker registrar", () => buildServiceWorkerRegistrar(serviceWorkers))
-	// 4. inject the sw reg program into the output main html
-	await stage("Add service worker registrar to HTML", () => injectScriptIntoDistHtml(toInject))
-	// 5. esbuild-plugin-html unfortunately does not understand the social media meta tags, so copy over assets we need for them
-	// await stage("Copy meta assets", () => copyMeta())
+	if (fs.existsSync("./src/sw")) {
+		// 2. build the service workers that can refer to assets built from the main program
+		const serviceWorkers = await stage("Build service workers", () => buildServiceWorkers(builtAssets))
+		// 3. build the service worker registering program that can refer to the service workers built
+		const toInject = await stage("Build service worker registrar", () => buildServiceWorkerRegistrar(serviceWorkers))
+		// 4. inject the sw reg program into the output main html
+		await stage("Add service worker registrar to HTML", () => injectScriptIntoDistHtml(toInject))
+		// 5. esbuild-plugin-html unfortunately does not understand the social media meta tags, so copy over assets we need for them
+		// await stage("Copy meta assets", () => copyMeta())
+	}
 }
 
 async function cleanup() {
