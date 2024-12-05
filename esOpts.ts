@@ -28,7 +28,7 @@ export const makeBuildOptions = (dev: boolean, extra?: {define: BuildOptions["de
 			".ttf": "file",
 			".gif": "file",
 			".png": "file",
-			".svg": "dataurl",
+			".svg": "file",
 		},
 		plugins: [
 			htmlPlugin({
