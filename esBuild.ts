@@ -6,13 +6,16 @@ import * as fs from "node:fs"
 import * as fsp from "node:fs/promises"
 import {makeBuildOptions} from "./esOpts.ts"
 import {stage} from "./buildStage.ts"
+import {getConfig} from "./config.ts"
+
+const {config} = await getConfig()
 
 export async function build() {
 	// 0. cleanup
 	await stage("Cleanup environment", () => cleanup())
 	// 1. build the main program from the html
 	const builtAssets = await stage("Build main program", () => buildMainProgram())
-	if (fs.existsSync("./src/sw")) {
+	if (fs.existsSync(config.serviceWorkers)) {
 		// 2. build the service workers that can refer to assets built from the main program
 		const serviceWorkers = await stage("Build service workers", () => buildServiceWorkers(builtAssets))
 		// 3. build the service worker registering program that can refer to the service workers built
@@ -60,7 +63,7 @@ async function buildServiceWorkers(BUILT_ASSETS: string[]) {
 			),
 		},
 	})
-	swBuildOptions.entryPoints = ["./src/sw/*.ts"]
+	swBuildOptions.entryPoints = [config.serviceWorkers + "/*.ts"]
 	const out = swBuildOptions.outdir
 	swBuildOptions.entryNames = "sw-[name]-[hash]"
 
@@ -78,7 +81,7 @@ async function buildMainProgram() {
 	})
 
 	if (process.argv.includes("--meta")) {
-		await fsp.writeFile(path.join(buildOptions.outdir, ".meta.json"), JSON.stringify(ctx.metafile))
+		await fsp.writeFile(path.join(buildOptions.outdir, config.metaFile), JSON.stringify(ctx.metafile))
 	}
 
 	return Object.keys(ctx.metafile?.outputs ?? []).map((x) => "/" + path.relative(buildOptions.outdir, x))

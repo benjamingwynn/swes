@@ -11,7 +11,7 @@ import {parseJSoncFile} from "./jsonc.ts"
 
 const defaultConfig = {
 	entrypoint: "./src/index.html",
-	serviceWorkers: "./src/sw/*",
+	serviceWorkers: "./src/sw",
 	devPort: 1234,
 	buildFolder: "dist",
 	metaFile: ".meta.json",

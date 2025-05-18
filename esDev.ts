@@ -3,6 +3,9 @@
 import esbuild from "esbuild"
 import * as fsp from "node:fs/promises"
 import {makeBuildOptions} from "./esOpts.ts"
+import {getConfig} from "./config.ts"
+
+const {config} = await getConfig()
 
 export async function startDevServer() {
 	const buildOptions = makeBuildOptions(true)
@@ -13,7 +16,7 @@ export async function startDevServer() {
 
 	ctx.watch()
 
-	const server = await ctx.serve({port: 1234, fallback: "/index.html", servedir: outdir})
+	const server = await ctx.serve({port: config.devPort, fallback: "/index.html", servedir: outdir})
 	console.log(`watching & listening at http://${server.host}:${server.port}`)
 	// console.log("(end)")
 }

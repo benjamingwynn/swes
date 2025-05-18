@@ -4,17 +4,20 @@ import esbuildSvelte from "esbuild-svelte"
 import sveltePreprocess from "svelte-preprocess"
 import htmlPlugin from "@chialab/esbuild-plugin-html"
 import type {BuildOptions} from "esbuild"
+import {getConfig} from "./config.ts"
+
+const {config} = await getConfig()
 
 export const makeBuildOptions = (dev: boolean, extra?: {define: BuildOptions["define"]}): BuildOptions & {outdir: string} => {
 	return {
-		entryPoints: ["./src/index.html"],
+		entryPoints: [config.entrypoint],
 		minify: !dev,
 		sourcemap: dev,
 		// banner: {
 		// 	js: `/* https://github.com/benjamingwynn/swes */`,
 		// 	css: `/* https://github.com/benjamingwynn/swes */`,
 		// },
-		outdir: dev ? ".swes" : "dist",
+		outdir: dev ? ".swes" : config.buildFolder,
 		assetNames: "assets/[name]-[hash]",
 		platform: "browser",
 		entryNames: "index",
