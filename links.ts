@@ -21,11 +21,18 @@ export async function handleLinks(config: Awaited<ReturnType<typeof getConfig>>[
 		await fsp.mkdir(path.join(linkLocation, ".."), {recursive: true})
 
 		if (dev) {
-			// just copy the file
-			await fsp.cp(linkTarget, linkLocation)
-		} else {
 			// use a symlink
 			await fsp.symlink(linkTarget, linkLocation)
+		} else {
+			// just copy the file
+			const stat = await fsp.lstat(linkTarget)
+			if (stat.isSymbolicLink()) {
+				// unpack symlinks
+				const realLinkTarget = await fsp.readlink(linkTarget)
+				await fsp.cp(realLinkTarget, linkLocation)
+			} else {
+				await fsp.cp(linkTarget, linkLocation)
+			}
 		}
 	}
 }
