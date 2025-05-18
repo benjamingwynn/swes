@@ -86,6 +86,12 @@ async function helpAll() {
 				defaults.includes("visualizer") ? c.bgMagenta(`"${config.visualizer}"`) : c.bgYellow(`"${config.visualizer}"`)
 			},`
 	)
+	console.log(
+		"    " +
+			`  ${c.bold(c.greenBright("links"))}: ${
+				defaults.includes("links") ? c.bgMagenta(`"${JSON.stringify(config.links)}"`) : c.bgYellow(`"${JSON.stringify(config.links)}"`)
+			},`
+	)
 	console.log("    " + "}\n")
 
 	if (configPath) {
