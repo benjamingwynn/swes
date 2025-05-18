@@ -28,10 +28,11 @@ export async function handleLinks(config: Awaited<ReturnType<typeof getConfig>>[
 			const stat = await fsp.lstat(linkTarget)
 			if (stat.isSymbolicLink()) {
 				// unpack symlinks
-				const realLinkTarget = await fsp.readlink(linkTarget)
-				await fsp.cp(realLinkTarget, linkLocation)
+				const linksLink = await fsp.readlink(linkTarget)
+				const realLinkTarget = path.resolve(path.dirname(linkTarget), linksLink)
+				await fsp.cp(realLinkTarget, linkLocation, {recursive: true})
 			} else {
-				await fsp.cp(linkTarget, linkLocation)
+				await fsp.cp(linkTarget, linkLocation, {recursive: true})
 			}
 		}
 	}
