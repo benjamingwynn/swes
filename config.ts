@@ -16,6 +16,8 @@ const defaultConfig = {
 	buildFolder: "dist",
 	metaFile: ".meta.json",
 	visualizer: "esbuild-visualizer --open --metadata",
+	/** e.g. `/place` -> `./path/in/this/repo` */
+	links: {} as Record<string, string>,
 }
 
 async function readJsoncFile(filePath: string) {

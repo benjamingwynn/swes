@@ -7,12 +7,17 @@ import * as fsp from "node:fs/promises"
 import {makeBuildOptions} from "./esOpts.ts"
 import {stage} from "./buildStage.ts"
 import {getConfig} from "./config.ts"
+import {handleLinks} from "./links.ts"
 
 const {config} = await getConfig()
 
 export async function build() {
 	// 0. cleanup
 	await stage("Cleanup environment", () => cleanup())
+
+	// (squeeze in linking)
+	await stage("Creating links", () => handleLinks(config, false))
+
 	// 1. build the main program from the html
 	const builtAssets = await stage("Build main program", () => buildMainProgram())
 	if (fs.existsSync(config.serviceWorkers)) {
@@ -30,6 +35,7 @@ export async function build() {
 async function cleanup() {
 	const buildOptions = makeBuildOptions(false)
 	await fsp.rm(buildOptions.outdir, {recursive: true, force: true})
+	await fsp.mkdir(buildOptions.outdir)
 }
 
 async function buildServiceWorkerRegistrar(SERVICE_WORKERS: string[]) {
