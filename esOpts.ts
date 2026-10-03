@@ -5,6 +5,7 @@ import sveltePreprocess from "svelte-preprocess"
 import htmlPlugin from "@chialab/esbuild-plugin-html"
 import type {BuildOptions} from "esbuild"
 import {getConfig} from "./config.ts"
+import path from "node:path"
 
 const {config} = await getConfig()
 
@@ -54,4 +55,20 @@ export const makeBuildOptions = (dev: boolean, extra?: {define: BuildOptions["de
 			...extra?.define,
 		},
 	}
+}
+
+export function makeWorkerBuildOptions(dev: boolean, extra?: {define: BuildOptions["define"]}) {
+	if (!config.webWorkers) {
+		console.log("skip building web workers")
+		return null
+	}
+	const workerBuildOptions = makeBuildOptions(dev, extra)
+	// todo: allow configuring output directory name, current just uses the basename of the input dir
+	workerBuildOptions.outdir = path.join(workerBuildOptions.outdir, path.basename(config.webWorkers))
+	workerBuildOptions.entryPoints = [config.webWorkers + "/*.ts"]
+	const out = workerBuildOptions.outdir
+	console.log("building web workers!")
+	workerBuildOptions.entryNames = "[name]"
+
+	return workerBuildOptions
 }

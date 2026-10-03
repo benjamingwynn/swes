@@ -4,7 +4,7 @@ import fs from "node:fs"
 import esbuild from "esbuild"
 import * as fsp from "node:fs/promises"
 import * as path from "node:path/posix"
-import {makeBuildOptions} from "./esOpts.ts"
+import {makeBuildOptions, makeWorkerBuildOptions} from "./esOpts.ts"
 import {getConfig} from "./config.ts"
 import {handleLinks} from "./links.ts"
 
@@ -12,6 +12,7 @@ const {config} = await getConfig()
 
 export async function startDevServer() {
 	const buildOptions = makeBuildOptions(true)
+	const workerBuildOptions = makeWorkerBuildOptions(true)
 
 	const outdir = path.join(process.cwd(), buildOptions.outdir)
 	await fsp.rm(outdir, {recursive: true, force: true})
@@ -23,6 +24,11 @@ export async function startDevServer() {
 	const ctx = await esbuild.context(buildOptions)
 
 	ctx.watch()
+	if (workerBuildOptions) {
+		console.log("web workers enabled!")
+		const ctx2 = await esbuild.context(workerBuildOptions)
+		ctx2.watch()
+	}
 
 	const server = await ctx.serve({port: config.devPort, fallback: "/index.html", servedir: outdir})
 	console.log(`watching & listening at http://${server.host}:${server.port}`)

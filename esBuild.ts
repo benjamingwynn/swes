@@ -4,7 +4,7 @@ import path from "node:path"
 import esbuild from "esbuild"
 import * as fs from "node:fs"
 import * as fsp from "node:fs/promises"
-import {makeBuildOptions} from "./esOpts.ts"
+import {makeBuildOptions, makeWorkerBuildOptions} from "./esOpts.ts"
 import {stage} from "./buildStage.ts"
 import {getConfig} from "./config.ts"
 import {handleLinks} from "./links.ts"
@@ -23,6 +23,8 @@ export async function build() {
 	if (fs.existsSync(config.serviceWorkers)) {
 		// 2. build the service workers that can refer to assets built from the main program
 		const serviceWorkers = await stage("Build service workers", () => buildServiceWorkers(builtAssets))
+		// 2b. build the regular web workers
+		const webWorkers = await stage("Build web workers", () => buildWebWorkers(builtAssets))
 		// 3. build the service worker registering program that can refer to the service workers built
 		const toInject = await stage("Build service worker registrar", () => buildServiceWorkerRegistrar(serviceWorkers))
 		// 4. inject the sw reg program into the output main html
@@ -74,6 +76,24 @@ async function buildServiceWorkers(BUILT_ASSETS: string[]) {
 	swBuildOptions.entryNames = "sw-[name]-[hash]"
 
 	const swCtx = await esbuild.build(swBuildOptions)
+
+	return Object.keys(swCtx.metafile?.outputs ?? []).map((x) => "/" + path.relative(out, x))
+}
+
+async function buildWebWorkers(BUILT_ASSETS: string[]) {
+	const workerBuildOptions = makeWorkerBuildOptions(false, {
+		define: {
+			BUILT_ASSETS: JSON.stringify(
+				// replace `/index.html` with `/`
+				BUILT_ASSETS.map((asset) => (asset === "/index.html" ? "/" : asset))
+			),
+		},
+	})
+	if (!workerBuildOptions) {
+		console.log("skip building web workers")
+		return
+	}
+	const swCtx = await esbuild.build(workerBuildOptions)
 
 	return Object.keys(swCtx.metafile?.outputs ?? []).map((x) => "/" + path.relative(out, x))
 }
