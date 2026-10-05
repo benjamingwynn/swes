@@ -8,8 +8,11 @@ import * as path from "node:path/posix"
 import {makeBuildOptions, makeWorkerBuildOptions} from "./esOpts.ts"
 import {getConfig} from "./config.ts"
 import {handleLinks} from "./links.ts"
+import {runStaticBuilder} from "./runStaticBuilder.ts"
 
 const {config} = await getConfig()
+
+const staticBuilders = new Map<string, Promise<string>>()
 
 export async function startDevServer() {
 	const buildOptions = makeBuildOptions(true)
@@ -41,6 +44,46 @@ export async function startDevServer() {
 	// esbuild needs us proxy requests to add headers
 	// we need to add headers for cross-origin-isolation, see https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated
 	http.createServer((req, res) => {
+		if (req.url) {
+			const url = new URL("http://localhost" + req.url)
+			// run static builders WHEN paths are requested
+			for (const [staticResourcePath, command] of Object.entries(config.staticBuilders)) {
+				const fileName = path.basename(staticResourcePath)
+				if (url.pathname === staticResourcePath) {
+					const s = staticBuilders.get(staticResourcePath)
+					let promise: Promise<string>
+					if (s) {
+						promise = s
+						console.log("[ .. ] waiting for static resource")
+					} else {
+						console.log("[ .. ] building static resource")
+						const outPath = path.join(outdir, fileName)
+						promise = runStaticBuilder(command, outPath).then(async () => {
+							// get contents on disk from assets directory
+							const contents = await fsp.readFile(outPath, "utf8")
+							return contents
+						})
+						staticBuilders.set(staticResourcePath, promise)
+					}
+					promise
+						.then((contents) => {
+							console.log("[ ok ] building static resource")
+							res.end(contents)
+						})
+						.catch((err) => {
+							console.error("[fail] building static resource")
+							res.writeHead(500, {"content-type": "text/plain"})
+							res.end(err.toString() + "\n")
+						})
+						.finally(() => {
+							console.log("[ .x ] building static resource")
+							// clear me so if we retry we build again. this is mainly to stop racing processes
+							staticBuilders.delete(staticResourcePath)
+						})
+					return
+				}
+			}
+		}
 		const proxyReq = http.request(
 			{
 				host: server.host,

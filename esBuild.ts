@@ -8,6 +8,7 @@ import {makeBuildOptions, makeWorkerBuildOptions} from "./esOpts.ts"
 import {stage} from "./buildStage.ts"
 import {getConfig} from "./config.ts"
 import {handleLinks} from "./links.ts"
+import {runStaticBuilder} from "./runStaticBuilder.ts"
 
 const {config} = await getConfig()
 
@@ -20,6 +21,14 @@ export async function build() {
 
 	// 1. build the main program from the html
 	const builtAssets = await stage("Build main program", () => buildMainProgram())
+	// 1b. fire static builders
+	await stage("Run static builders", async () => {
+		for (const [staticResourcePath, command] of Object.entries(config.staticBuilders)) {
+			const outPath = path.join(config.buildFolder, staticResourcePath)
+			await runStaticBuilder(command, outPath)
+		}
+	})
+
 	if (fs.existsSync(config.serviceWorkers)) {
 		// 2. build the service workers that can refer to assets built from the main program
 		const serviceWorkers = await stage("Build service workers", () => buildServiceWorkers(builtAssets))

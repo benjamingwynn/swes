@@ -19,6 +19,8 @@ const defaultConfig = {
 	visualizer: "esbuild-visualizer --open --metadata",
 	/** e.g. `/place` -> `./path/in/this/repo` */
 	links: {} as Record<string, string>,
+	/** e.g. `/place` -> `command to build place into $1` */
+	staticBuilders: {} as Record<string, string>,
 }
 
 async function readJsoncFile(filePath: string) {
