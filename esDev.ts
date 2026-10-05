@@ -58,11 +58,7 @@ export async function startDevServer() {
 					} else {
 						console.log("[ .. ] building static resource")
 						const outPath = path.join(outdir, fileName)
-						promise = runStaticBuilder(command, outPath).then(async () => {
-							// get contents on disk from assets directory
-							const contents = await fsp.readFile(outPath, "utf8")
-							return contents
-						})
+						promise = runStaticBuilder(command, outPath)
 						staticBuilders.set(staticResourcePath, promise)
 					}
 					promise
